@@ -10,7 +10,11 @@ import org.apache.commons.codec.binary.Base64;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Properties;
 
 /**
  * @author jiangwj20966 2018/9/14
@@ -41,7 +45,7 @@ public class BaiduRecognitionUtil {
 
 
     private static String getResult(String imgBase64, String accessToken) throws IOException {
-        if (accessToken==null) {
+        if (accessToken == null) {
             return null;
         }
         OkHttpClient okHttpClient = new OkHttpClient();
@@ -74,11 +78,44 @@ public class BaiduRecognitionUtil {
     }
 
 
+    static {
+        try {
+            Properties properties = new Properties();
+            properties.load(BaiduRecognitionUtil.class.getResource("/config.properties").openStream());
+            BaiduRecognitionUtil.setAppKey(properties.getProperty("app.key"));
+            BaiduRecognitionUtil.setAppSecret(properties.getProperty("app.secret"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    public static void writeConfigIntoProperties() {
+        try {
+            OutputStream outputStream = new FileOutputStream(BaiduRecognitionUtil.class.getResource("/config.properties").getFile());
+            Properties properties = new Properties();
+            if (BaiduRecognitionUtil.getAppKey() != null) {
+                properties.setProperty("app.key", BaiduRecognitionUtil.getAppKey());
+            }
+            if (BaiduRecognitionUtil.getAppSecret() != null) {
+                properties.setProperty("app.secret", BaiduRecognitionUtil.getAppSecret());
+            }
+            PrintWriter printWriter = new PrintWriter(outputStream);
+            properties.list(printWriter);
+            printWriter.flush();
+            printWriter.close();
+            outputStream.flush();
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-
-
-
+    public static void main(String[] args) {
+        System.out.println(BaiduRecognitionUtil.getAppKey());
+        BaiduRecognitionUtil.setAppSecret("12341234");
+        BaiduRecognitionUtil.setAppKey("123143212");
+        BaiduRecognitionUtil.writeConfigIntoProperties();
+    }
 
     public static String getAccessTokenUrl() {
         return ACCESS_TOKEN_URL;

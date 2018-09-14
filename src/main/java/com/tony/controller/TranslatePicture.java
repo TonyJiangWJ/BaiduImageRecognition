@@ -88,19 +88,22 @@ public class TranslatePicture extends Application {
         apiUrl.setPromptText("识别接口");
         apiUrl.setText(BaiduRecognitionUtil.getGenerateUrl());
         apiUrl.setMinWidth(350);
-        TextField appSecret = new TextField();
-        appSecret.setPromptText("appSecret");
-        appSecret.setText(BaiduRecognitionUtil.getAppSecret());
+
         TextField appKey = new TextField();
         appKey.setText(BaiduRecognitionUtil.getAppKey());
         appKey.setPromptText("appKey");
 
+        TextField appSecret = new TextField();
+        appSecret.setPromptText("appSecret");
+        appSecret.setText(BaiduRecognitionUtil.getAppSecret());
+
         grid.add(new Label("识别接口:"), 0, 0);
         grid.add(apiUrl, 1, 0);
-        grid.add(new Label("appSecret:"), 0, 1);
-        grid.add(appSecret, 1, 1);
-        grid.add(new Label("appKey:"), 0, 2);
-        grid.add(appKey, 1, 2);
+        grid.add(new Label("appKey:"), 0, 1);
+        grid.add(appKey, 1, 1);
+        grid.add(new Label("appSecret:"), 0, 2);
+        grid.add(appSecret, 1, 2);
+
 
         dialog.getDialogPane().setContent(grid);
 
@@ -122,6 +125,7 @@ public class TranslatePicture extends Application {
             BaiduRecognitionUtil.setAppKey(returnedValue.getAppKey());
             BaiduRecognitionUtil.setAppSecret(returnedValue.getAppSecret());
             BaiduRecognitionUtil.setGenerateUrl(returnedValue.getApiUrl());
+            BaiduRecognitionUtil.writeConfigIntoProperties();
         });
     }
 
