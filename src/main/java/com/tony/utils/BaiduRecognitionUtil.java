@@ -79,19 +79,28 @@ public class BaiduRecognitionUtil {
 
 
     static {
-        try {
-            Properties properties = new Properties();
-            properties.load(BaiduRecognitionUtil.class.getResource("/config.properties").openStream());
-            BaiduRecognitionUtil.setAppKey(properties.getProperty("app.key"));
-            BaiduRecognitionUtil.setAppSecret(properties.getProperty("app.secret"));
+
+        Properties properties = new Properties();
+        File file = new File("./config.properties");
+        try (
+                FileInputStream fileInputStream = new FileInputStream(file);
+        ) {
+            if (file.exists()) {
+                properties.load(fileInputStream);
+                BaiduRecognitionUtil.setAppKey(properties.getProperty("app.key"));
+                BaiduRecognitionUtil.setAppSecret(properties.getProperty("app.secret"));
+
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static void writeConfigIntoProperties() {
-        try {
-            OutputStream outputStream = new FileOutputStream(BaiduRecognitionUtil.class.getResource("/config.properties").getFile());
+        try (
+                OutputStream outputStream = new FileOutputStream(("./config.properties"));
+                PrintWriter printWriter = new PrintWriter(outputStream);
+        ) {
             Properties properties = new Properties();
             if (BaiduRecognitionUtil.getAppKey() != null) {
                 properties.setProperty("app.key", BaiduRecognitionUtil.getAppKey());
@@ -99,12 +108,9 @@ public class BaiduRecognitionUtil {
             if (BaiduRecognitionUtil.getAppSecret() != null) {
                 properties.setProperty("app.secret", BaiduRecognitionUtil.getAppSecret());
             }
-            PrintWriter printWriter = new PrintWriter(outputStream);
             properties.list(printWriter);
             printWriter.flush();
-            printWriter.close();
             outputStream.flush();
-            outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
