@@ -1,4 +1,4 @@
-package com.tony;
+package com.tony.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.FormBody;
@@ -13,18 +13,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
- * @author jiangwj20966 2018/9/6
+ * @author jiangwj20966 2018/9/14
  */
-public class MainTest {
+public class BaiduRecognitionUtil {
 
     private static String ACCESS_TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token";
     private static String GENERATE_URL = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic";
-    private static String appKey = "3RQGeLiC4m2fM8A1x56KRP6G";
-    private static String appSecret = "IXfU7qOTcOEdhM57Rl5hAE5j0IUnoGi0";
+    private static String appKey = "";
+    private static String appSecret = "";
 
-    public static void main(String[] args) throws Exception {
-        String filePath = "C:\\Users\\jiangwj20966\\Desktop\\TIM截图20180906170440.png";
-        File image = new File(filePath);
+    public static String getPicContent(File image) throws Exception {
+
         FileInputStream fileInputStream = new FileInputStream(image);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buff = new byte[1024];
@@ -37,12 +36,14 @@ public class MainTest {
 
         String accessToken = getAccessToken();
 
-        getResult(base64Str, accessToken);
-
+        return getResult(base64Str, accessToken);
     }
 
 
     private static String getResult(String imgBase64, String accessToken) throws IOException {
+        if (accessToken==null) {
+            return null;
+        }
         OkHttpClient okHttpClient = new OkHttpClient();
         FormBody formBody = new FormBody.Builder().add("image", imgBase64)
 //                .add("grant_type", "client_credentials")
@@ -52,6 +53,7 @@ public class MainTest {
         if (response != null && response.body() != null) {
             JSONObject result = (JSONObject) JSONObject.parse(response.body().string());
             System.out.println(result.toJSONString());
+            return result.toJSONString();
         }
         return null;
     }
@@ -69,5 +71,44 @@ public class MainTest {
             return accessKey;
         }
         return null;
+    }
+
+
+
+
+
+
+
+
+    public static String getAccessTokenUrl() {
+        return ACCESS_TOKEN_URL;
+    }
+
+    public static void setAccessTokenUrl(String accessTokenUrl) {
+        ACCESS_TOKEN_URL = accessTokenUrl;
+    }
+
+    public static String getGenerateUrl() {
+        return GENERATE_URL;
+    }
+
+    public static void setGenerateUrl(String generateUrl) {
+        GENERATE_URL = generateUrl;
+    }
+
+    public static String getAppKey() {
+        return appKey;
+    }
+
+    public static void setAppKey(String appKey) {
+        BaiduRecognitionUtil.appKey = appKey;
+    }
+
+    public static String getAppSecret() {
+        return appSecret;
+    }
+
+    public static void setAppSecret(String appSecret) {
+        BaiduRecognitionUtil.appSecret = appSecret;
     }
 }
