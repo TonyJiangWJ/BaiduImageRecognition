@@ -1,11 +1,14 @@
 package com.tony.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.tony.utils.BaiduRecognitionUtil;
 import com.tony.utils.JsonFormatUtil;
+import com.tony.utils.ResultResolver;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -39,7 +42,14 @@ public class BaiduImageRecognitionController {
     @FXML
     private Label loadingText;
 
+    @FXML
+    private CheckBox showFullText;
+    @FXML
+    private CheckBox segmenterCheckbox;
+
     private File chosenFile;
+
+    private String tempPrettyJSON;
 
     @FXML
     private void chooseFile() {
@@ -76,7 +86,7 @@ public class BaiduImageRecognitionController {
     private void startRecognition() {
         if (chosenFile != null && chosenFile.canRead()) {
             loadingText.setVisible(true);
-            textContent.setWrapText(false);
+            textContent.setWrapText(true);
             Executors.newSingleThreadExecutor().submit(() -> {
                 try {
                     String result = BaiduRecognitionUtil.getPicContent(chosenFile);
@@ -91,9 +101,8 @@ public class BaiduImageRecognitionController {
                         });
                     } else {
                         Platform.runLater(() -> {
-                            JsonFormatUtil jsonFormatUtil = new JsonFormatUtil();
-
-                            textContent.setText(jsonFormatUtil.formatJSONString(result));
+                            this.tempPrettyJSON = JsonFormatUtil.prettyJson(result);
+                            this.fullTextChanged();
                         });
                     }
                     Platform.runLater(() -> {
@@ -139,6 +148,22 @@ public class BaiduImageRecognitionController {
         }
     }
 
+    @FXML
+    private void fullTextChanged() {
+        if (tempPrettyJSON != null) {
+            // 是否只显示执行识别之后的文本
+            if (showFullText.isSelected()) {
+                String fullContent = ResultResolver.getFullText(JSON.parseObject(tempPrettyJSON));
+                // 是否开启分词
+                if (segmenterCheckbox.isSelected()) {
+                    fullContent = ResultResolver.getSegmenterString(fullContent);
+                }
+                textContent.setText(fullContent);
+            } else {
+                textContent.setText(tempPrettyJSON);
+            }
+        }
+    }
 
     public void setTranslatePicture(TranslatePicture translatePicture) {
         this.translatePicture = translatePicture;

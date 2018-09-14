@@ -7,6 +7,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.codec.binary.Base64;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,17 +34,38 @@ public class BaiduRecognitionUtil {
     private static final String APP_KEY_K = "app.key";
     private static final String APP_SECRET_K = "app.secret";
 
-    public static String getPicContent(File image) throws Exception {
+    private static final double MAX_WIDTH_OR_HEIGHT = 4096;
+
+    public static String getPicContent(File imageFile) throws Exception {
 
         try (
-                FileInputStream fileInputStream = new FileInputStream(image);
+                FileInputStream fileInputStream = new FileInputStream(imageFile);
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ) {
-            byte[] buff = new byte[1024];
-            int l = -1;
-            while ((l = fileInputStream.read(buff)) > 0) {
-                outputStream.write(buff, 0, l);
+            String fileName = imageFile.getName();
+            String format = fileName.substring(fileName.lastIndexOf('.') + 1);
+            BufferedImage image = ImageIO.read(fileInputStream);
+            double width = image.getWidth();
+            double height = image.getHeight();
+
+            // 超大的图片进行压缩
+            if (width > MAX_WIDTH_OR_HEIGHT || height > MAX_WIDTH_OR_HEIGHT) {
+                double scale = 1;
+                if (width > height) {
+                    scale = MAX_WIDTH_OR_HEIGHT / width;
+                } else {
+                    scale = MAX_WIDTH_OR_HEIGHT / height;
+                }
+                int newWidth = (int) (width * scale);
+                int newHeight = (int) (height * scale);
+                BufferedImage bufferedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+                Graphics graphics = bufferedImage.createGraphics();
+                graphics.drawImage(image, 0, 0, newWidth, newHeight, null);
+                ImageIO.write(bufferedImage, format, outputStream);
+            } else {
+                ImageIO.write(image, format, outputStream);
             }
+
             String base64Str = Base64.encodeBase64String(outputStream.toByteArray());
             System.out.println(base64Str);
 
