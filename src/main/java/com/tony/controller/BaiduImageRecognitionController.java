@@ -5,8 +5,10 @@ import com.tony.utils.JsonFormatUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -23,9 +25,6 @@ import java.util.concurrent.Executors;
  * @author jiangwj20966 2018/9/14
  */
 public class BaiduImageRecognitionController {
-
-    @FXML
-    private ListView<String> listView;
 
     private TranslatePicture translatePicture;
 
@@ -60,8 +59,10 @@ public class BaiduImageRecognitionController {
             chosenFile = file;
             fileLocation.setText(chosenFile.getAbsolutePath());
             if (chosenFile.canRead()) {
-                try {
-                    Image image = new Image(new FileInputStream(chosenFile));
+                try (
+                        FileInputStream fileInputStream = new FileInputStream(chosenFile);
+                ) {
+                    Image image = new Image(fileInputStream);
                     imageView.setImage(image);
                 } catch (Exception e) {
 
@@ -102,6 +103,39 @@ public class BaiduImageRecognitionController {
                     e.printStackTrace();
                 }
             });
+        }
+    }
+
+    /**
+     * 单击图片后展示图片大图，暂时不可缩放
+     */
+    @FXML
+    private void showBigPicture() {
+        Dialog dialog = new Dialog();
+        ImageView imageView = new ImageView();
+        if (chosenFile != null) {
+            try (FileInputStream fileInputStream = new FileInputStream(chosenFile)) {
+                imageView.setImage(new Image(fileInputStream));
+
+                imageView.setSmooth(true);
+
+                ScrollPane scrollPane = new ScrollPane();
+                scrollPane.setFitToHeight(true);
+                scrollPane.setFitToWidth(true);
+
+                scrollPane.setContent(imageView);
+
+                dialog.getDialogPane().setMaxHeight(600);
+                dialog.getDialogPane().setMaxWidth(600);
+
+                dialog.getDialogPane().setContent(scrollPane);
+
+                dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+                dialog.setResizable(true);
+                dialog.showAndWait();
+            } catch (Exception e) {
+
+            }
         }
     }
 

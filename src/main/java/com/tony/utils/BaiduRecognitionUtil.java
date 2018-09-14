@@ -26,21 +26,28 @@ public class BaiduRecognitionUtil {
     private static String appKey = "";
     private static String appSecret = "";
 
+    private static final String CONFIG_FILE_LOCATION = "./config.properties";
+
+    private static final String APP_KEY_K = "app.key";
+    private static final String APP_SECRET_K = "app.secret";
+
     public static String getPicContent(File image) throws Exception {
 
-        FileInputStream fileInputStream = new FileInputStream(image);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] buff = new byte[1024];
-        int l = -1;
-        while ((l = fileInputStream.read(buff)) > 0) {
-            outputStream.write(buff, 0, l);
+        try (
+                FileInputStream fileInputStream = new FileInputStream(image);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ) {
+            byte[] buff = new byte[1024];
+            int l = -1;
+            while ((l = fileInputStream.read(buff)) > 0) {
+                outputStream.write(buff, 0, l);
+            }
+            String base64Str = Base64.encodeBase64String(outputStream.toByteArray());
+            System.out.println(base64Str);
+
+            String accessToken = getAccessToken();
+            return getResult(base64Str, accessToken);
         }
-        String base64Str = Base64.encodeBase64String(outputStream.toByteArray());
-        System.out.println(base64Str);
-
-        String accessToken = getAccessToken();
-
-        return getResult(base64Str, accessToken);
     }
 
 
@@ -81,32 +88,31 @@ public class BaiduRecognitionUtil {
     static {
 
         Properties properties = new Properties();
-        File file = new File("./config.properties");
-        try (
-                FileInputStream fileInputStream = new FileInputStream(file);
-        ) {
-            if (file.exists()) {
+        File file = new File(CONFIG_FILE_LOCATION);
+        if (file.exists()) {
+            try (
+                    FileInputStream fileInputStream = new FileInputStream(file);
+            ) {
                 properties.load(fileInputStream);
-                BaiduRecognitionUtil.setAppKey(properties.getProperty("app.key"));
-                BaiduRecognitionUtil.setAppSecret(properties.getProperty("app.secret"));
-
+                BaiduRecognitionUtil.setAppKey(properties.getProperty(APP_KEY_K));
+                BaiduRecognitionUtil.setAppSecret(properties.getProperty(APP_SECRET_K));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
     public static void writeConfigIntoProperties() {
         try (
-                OutputStream outputStream = new FileOutputStream(("./config.properties"));
+                OutputStream outputStream = new FileOutputStream((CONFIG_FILE_LOCATION));
                 PrintWriter printWriter = new PrintWriter(outputStream);
         ) {
             Properties properties = new Properties();
             if (BaiduRecognitionUtil.getAppKey() != null) {
-                properties.setProperty("app.key", BaiduRecognitionUtil.getAppKey());
+                properties.setProperty(APP_KEY_K, BaiduRecognitionUtil.getAppKey());
             }
             if (BaiduRecognitionUtil.getAppSecret() != null) {
-                properties.setProperty("app.secret", BaiduRecognitionUtil.getAppSecret());
+                properties.setProperty(APP_SECRET_K, BaiduRecognitionUtil.getAppSecret());
             }
             properties.list(printWriter);
             printWriter.flush();
