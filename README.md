@@ -7,6 +7,8 @@
 - ![demo-img](./res/demo-display.png)
 - 新增分词功能-基于结巴分词
 - ![jieba-img](./res/demo-fenci.png)
+- 添加截图功能，可以直接截图然后识别
+  - 截图相关源代码来自于 https://gitee.com/alanzyy/ScreenCapture.git 
 ## 注意事项
 - 基于JDK8
 - 首次使用前请前往百度开放平台申请app key和secret key, 每日50000次免费接口

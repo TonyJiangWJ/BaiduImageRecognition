@@ -27,10 +27,11 @@
                <children>
                   <TextField id="fileLocation" fx:id="fileLocation" disable="true" layoutX="16.0" layoutY="15.0" prefHeight="23.0" prefWidth="566.0" />
                   <Button id="chooseFile" layoutX="16.0" layoutY="48.0" mnemonicParsing="false" onAction="#chooseFile" text="选择文件" />
-                  <Label fx:id="loadingText" layoutX="165.0" layoutY="52.0" prefHeight="15.0" prefWidth="98.0" text="加载中请稍候..." visible="false" />
-                  <Button layoutX="90.0" layoutY="48.0" mnemonicParsing="false" onAction="#startRecognition" text="开始识别" />
+                  <Label fx:id="loadingText" layoutX="219.0" layoutY="52.0" prefHeight="15.0" prefWidth="98.0" text="加载中请稍候..." visible="false" />
+                  <Button layoutX="144.0" layoutY="48.0" mnemonicParsing="false" onAction="#startRecognition" text="开始识别" />
                   <CheckBox fx:id="showFullText" layoutX="479.0" layoutY="52.0" mnemonicParsing="false" onAction="#fullTextChanged" text="只显示识别文本" />
                   <CheckBox fx:id="segmenterCheckbox" layoutX="427.0" layoutY="52.0" mnemonicParsing="false" onAction="#fullTextChanged" text="分词" />
+                  <Button layoutX="92.0" layoutY="48.0" mnemonicParsing="false" onAction="#captureScreen" text="截图" />
                </children>
             </AnchorPane>
         </items>

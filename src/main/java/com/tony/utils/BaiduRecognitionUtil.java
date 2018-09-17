@@ -1,6 +1,7 @@
 package com.tony.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import javafx.scene.image.Image;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -35,6 +36,13 @@ public class BaiduRecognitionUtil {
     private static final String APP_SECRET_K = "app.secret";
 
     private static final double MAX_WIDTH_OR_HEIGHT = 4096;
+
+    public static String getPicContent(byte[] captureImageArray) throws Exception {
+        String base64Str = Base64.encodeBase64String(captureImageArray);
+        System.out.println(base64Str);
+        String accessToken = getAccessToken();
+        return getResult(base64Str, accessToken);
+    }
 
     public static String getPicContent(File imageFile) throws Exception {
 
@@ -184,4 +192,6 @@ public class BaiduRecognitionUtil {
     public static void setAppSecret(String appSecret) {
         BaiduRecognitionUtil.appSecret = appSecret;
     }
+
+
 }
